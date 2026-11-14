@@ -1,0 +1,1 @@
+{"name":"trip-khingan","version":"0.0.0","private":true,"type":"module","scripts":{"check":"node --test tests/*.test.mjs","preview":"node scripts/serve.mjs","map:build":"node scripts/build-trip-map.mjs"},"packageManager":"pnpm@11.23.0","engines":{"node":">=24"}}

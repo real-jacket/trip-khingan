@@ -1,0 +1,8 @@
+work/
+node_modules/
+__pycache__/
+.env
+.env.*
+.DS_Store
+*.log
+.amap.local.json
