@@ -876,7 +876,7 @@
       if (!window.TripMap) return fail();
       TripMap.renderLegend(document.getElementById('map-terrain-legend'));
       tripMap = TripMap.create({
-        container: el, base: 'map/base.pmtiles', terrain: 'map/terrain.pmtiles', landcover: 'map/landcover.pmtiles', reliefTint: false, landcoverFullZoom: 9, maxBounds: [114.6, 45.0, 126.6, 51.0], reliefRange: [150, 1700], routes: 'map/routes.geojson',
+        container: el, base: 'map/base.pmtiles', terrain: 'map/terrain.pmtiles', landcover: 'map/landcover.pmtiles', reliefTint: false, landcoverFullZoom: 9, baseFullZoom: 12, detail: 'https://tiles.openfreemap.org/planet', maxZoom: 14, maxBounds: [114.6, 45.0, 126.6, 51.0], reliefRange: [150, 1700], routes: 'map/routes.geojson',
         points: mapPoints(activeStops()), activeRoutes: routeIds(), fitButton: false, errorText: message,
         onPointClick: point => selectItem(point.id, false),
         onUnsupported: fail

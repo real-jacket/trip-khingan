@@ -10,7 +10,7 @@
 
 底图是土地覆盖地形图，不只是山体阴影：用清晰可辨的颜色区分森林、其他绿色植被与草地、农田、城镇建成区、水体/湿地与裸地，上面叠山体阴影，保持柔和的编辑风配色，并放一个小的访客图例（`TripMap.renderLegend`）。土地覆盖只能叠加，不能替换分级路网（高速/国省道/县道/乡道，含路线编号）和行政层：省/市/县界以及市、县、乡镇名称。国界与争议线保持隐藏以符合合规要求。
 
-地图数据用 `pnpm map:build --routes|--extract [--dry-run]|--landcover|--validate` 按根目录 `map.json` 生成到 `site/map/`，合计不超过 40 MB；共用地图模块在 `site/vendor/map/`（自带，不依赖其他站点）。
+地图数据用 `pnpm map:build --routes|--extract [--dry-run]|--landcover|--validate` 按根目录 `map.json` 生成到 `site/map/`，合计不超过 40 MB；共用地图模块在 `site/vendor/map/`（自带一份，总览与兜底数据都自托管）。业主决定（2026-11-14）：放大后（默认 z11 起）叠加 OpenFreeMap 在线细节瓦片（`TripMap.create` 的 `detail` 选项），这只替代“不依赖其他站点”中的高缩放细节层；在线不可用时自动回退到自托管渲染，页面不得因此空白或向访客显示服务商报错。在线境界层必须保持 `admin_level > 2`、非 `disputed`、非 `maritime` 的过滤，不画国界和国家名；土地覆盖、山体阴影、路线、点位、图例、高德导航清单、字体都继续自托管。两个仓库的 `trip-map.js` / `trip-map.css` 保持逐字节一致。
 
 旅行首页（`travel-journal`）会收录本路书：保持 `site/trip.json` 有效，页面里“回旅行首页”的链接不要删。
 

@@ -1,6 +1,6 @@
 # 路书地图选型（调研日期 2026-11-07）
 
-结论先行：**MapLibre GL JS + 自托管 Protomaps PMTiles（矢量底图）+ Mapterhorn 地形 PMTiles（山体阴影）**，全部放在 GitHub Pages 同源，不引入任何第三方运行时域名或密钥。路线用 OSRM 公共 demo 在作者本机一次性生成 WGS-84 GeoJSON。引用方括号见文末，除特别标注外访问日期均为 2026-11-07。
+结论先行：**MapLibre GL JS + 自托管 Protomaps PMTiles（矢量底图）+ Mapterhorn 地形 PMTiles（山体阴影）**，全部放在 GitHub Pages 同源；2026-11-14 起高缩放细节层改为叠加 OpenFreeMap 在线瓦片（自托管仍是总览与离线兜底，见第 0a 节），除此之外不引入第三方运行时域名或密钥。路线用 OSRM 公共 demo 在作者本机一次性生成 WGS-84 GeoJSON。引用方括号见文末，除特别标注外访问日期均为 2026-11-07。
 
 > 网络说明：本机所有流量经代理/TUN，下文的延迟/可达性结论**不是**中国大陆实测。中国可达性只依据文档和公开报告，凡无依据处均列入“未验证”。
 
@@ -15,9 +15,21 @@
 - 境界只画省/地市/县（虚线），国界、争议线、海上界线过滤；标注只取 `script: Han`。
 - MapLibre 的 raster / raster-dem 源缺瓦片时不会回退到父级，会出现空洞。土地覆盖因此用同一文件再挂一个封顶 `landcoverFullZoom`（z9）的源垫底；底图/地形用分层抽取（低缩放大范围、高缩放走廊）+ `maxBounds` 控制。
 - 高德导航：`TripMap.navSegments` / `TripMap.amapRoute` 把每个方案/天切成“起点 → 途经 → 终点”段并转 GCJ-02，皖南 74 条链接与旧实现逐字节一致（测试锁定）。
-- 体积：皖南 base 14.7 + terrain 18.7 + landcover 4.7 ≈ 38.0 MB；大兴安岭 9.7 + 16.4 + 10.8 ≈ 36.9 MB；每趟上限 40 MB。
+- 体积（2026-11-14 更新）：base 12.5 + terrain 16.4 + landcover 10.8 ≈ 39.9 MB（另一趟见各自仓库）；每趟上限 40 MiB。
 - 线上 Range：浏览器请求正常（见第 5 节第 8 步的实测记录）。
-- 已知局限：拖到已制作范围以外的高缩放区域只剩土地覆盖、没有道路和阴影；大兴安岭 z12 片区之间的土地覆盖是 z9 放大，偏软。
+- 已知局限：土地覆盖文件只到 z12，z13 以上是放大，边缘带阶梯、偏软（已核对：文件里没有更细的数据，样式层面无法凭空补细节）。详细瓦片（z13–14）只沿路线走廊存在；MapLibre 对缺失的矢量瓦片画空白而不回退到父级，所以页面用 `baseFullZoom: 12` 让 `base` 源封顶 z12、全图过放大，道路/水系/地名因此在走廊外也不会留白；建筑与 POI 只存在于详细瓦片，由第二个 `base-detail` 源提供，走廊外没有。z15 详细瓦片不做：同一个源无法混用“走廊内有、走廊外无”的 z15 瓦片，否则 z14 走廊内的建筑与 POI 在 z15 会整片消失；最大缩放 z15/z14 靠 z14 过放大。
+
+## 0a. 高缩放细节层：在线细节 + 自托管兜底（2026-11-14，业主决定）
+
+自托管 PMTiles 受 40 MB 预算限制，走廊外没有街道级数据。业主决定改为**混合模式**：放大后（默认 z11 起）叠加在线细节瓦片，自托管数据负责总览和兜底。这只替换“零第三方域名”这一条中的高缩放细节层，其余全部仍然同源。
+
+- 在线源：OpenFreeMap 的 TileJSON `https://tiles.openfreemap.org/planet`（OpenMapTiles 矢量模式，maxzoom 14，免密钥）。页面通过 `TripMap.create` 的 `detail`（可选 `detailFromZoom`，默认 11；`detailMaxZoom`，默认 16）启用；不传 `detail` 时行为与以前完全一致。署名“OpenFreeMap © OpenMapTiles”只在在线细节生效时加入。
+- 始终自托管：土地覆盖栅格、山体阴影、路线、编号点位与聚合、图例、高德导航清单、字体 glyph。自托管矢量底图图层在在线生效时封顶到 `detailFromZoom`，低缩放总览外观不变。
+- 在线细节图层（`d-` 前缀，沿用同一套配色、线宽、字体和“只取汉字名称”的过滤）：道路及描边、路号与路名、地名、旅行 POI 与山峰、建筑（z14+）、水面/水系/水名、省/地/县界、土地利用与公园线，z13+ 的 OMT 土地覆盖面用来让 10 m 栅格边缘更清晰（同时把栅格淡出到 0.6）。名称遇到“汉字 + 蒙文”（如“满洲里市 ᠮᠠᠨᠵᠤᠤᠷ”）只取第一个空格之前的汉字，自托管 glyph 不含蒙文。
+- 合规：在线境界层只取 OSM `admin_level` 4（省）、5/6（地）、8（县），并显式要求 `admin_level > 2`、非 `disputed`、非 `maritime`；不画国界、争议线、海上界线，不显示国家名。国境另一侧外国的同级行政线（如俄方的区界）不在过滤范围内，会以细虚线出现。`tests/trip.test.mjs` 锁定了这条过滤。
+- 回退：页面加载时先探测 TileJSON（4 秒超时）；超时、失败或返回无效则始终保持离线渲染，访客看不到任何报错。在线生效后，若在线源连续 4 个瓦片失败（404 与主动取消不计）且中间没有成功，自动移除在线图层与源、恢复自托管图层与原最大缩放，之后不再重试。已验证：整站屏蔽在线域名后的总览与缩放、以及会话中途令瓦片地址失效。
+- 访客浏览器会向第三方发出的请求：`https://tiles.openfreemap.org/planet`（TileJSON）和它指向的 `https://tiles.openfreemap.org/planet/<版本>/{z}/{x}/{y}.pbf`。对方会看到访客 IP、浏览器信息和所看区域的瓦片坐标；本站不发送密钥或 cookie。屏蔽该域名时地图仍可用，只是走廊外的放大视图变空。
+- 中国大陆对 `tiles.openfreemap.org` 的可达性**未验证**（本机经代理）。OpenFreeMap 是公益服务，无 SLA；条款以其官网为准 [2]。
 
 ## 1. 需求（来自项目约束）
 
@@ -85,8 +97,8 @@
 
 ## 4. 推荐栈与兜底
 
-**推荐**：MapLibre GL JS + 本地 `base.pmtiles`（Protomaps，maxzoom 14）+ 本地 `terrain.pmtiles`（Mapterhorn，maxzoom 11）+ 本地 glyph/sprite + 本地路线/点位 GeoJSON，全部同源。
-**为什么**：外观完全可控；零第三方域名；零密钥；无运行时配额；体积可控（皖南约 34 MB，大兴安岭约 30 MB，替掉 anhui 的 12.5 MB HTML 内嵌数据）。
+**推荐**：MapLibre GL JS + 本地 `base.pmtiles`（Protomaps，maxzoom 14，走廊外 z12）+ 本地 `terrain.pmtiles`（Mapterhorn，皖南 maxzoom 10 全图、其余由页面 `terrainFullZoom` 过放大）+ 本地 glyph/sprite + 本地路线/点位 GeoJSON，全部同源。
+**为什么**：外观完全可控；总览与兜底零第三方域名、零密钥（高缩放细节层例外，见第 0a 节）；无运行时配额；体积可控（皖南约 34 MB，大兴安岭约 30 MB，替掉 anhui 的 12.5 MB HTML 内嵌数据）。
 **兜底（按顺序）**：
 1. 若 Pages 的 PMTiles Range 复测失败：改名 `*.pmtiles.gz`（旧 issue 记录的做法）[7]。
 2. 仍失败：把 PMTiles 放到其他对象存储（Cloudflare R2 等，需 CORS 允许 GET/HEAD、`range`、暴露 `etag`）[32]，大陆速度未验证。

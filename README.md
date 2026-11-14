@@ -19,7 +19,7 @@
   - 纯南线：约 880 公里，4 个住宿基地，D8 莫尔格勒河后返回海拉尔，D9 还车。
   - 追加额尔古纳：约 1070 公里，5 个住宿基地。页面建议按北部叶色决定，出发前 7 天再定。
 - 逐日行程：D1 至 D9，每天有路线说明和当天清单（可勾选，进度保存在浏览器本地存储里，存储不可用时页面仍能使用）。
-- 地图：土地覆盖地形底图（森林、植被、农田、城镇、水体等不同颜色，叠山体阴影）、分级道路和行政区划、画出的驾车路线、编号点位与图例；地图下方有按天分段的“用高德查看路线”清单。
+- 地图：土地覆盖地形底图（森林、植被、农田、城镇、水体等不同颜色，叠山体阴影）、分级道路和行政区划、画出的驾车路线、编号点位与图例；地图下方有按天分段的“用高德查看路线”清单；放大后叠加在线街道细节，离线时自动回到自托管底图。
 - 拍摄位置与参考图：每个参考图标注来源笔记名并链接到小红书原笔记；页面里的机位坐标多处写明“待核实”。
 - 取车后清单：车辆验收、合同与保险、导航与通信、加油与补给，另有路况施工、低温穿衣、防火停车、失联救援提示。
 - 住宿基地：阿尔山市区、伊尔施、柴河镇、海拉尔，以及可选的额尔古纳。
@@ -62,7 +62,7 @@ pnpm check
 
 - 照片归各自的摄影师所有，在页面里标注了来源并链接原笔记，本仓库不对它们重新授权。
 - `site/` 里带有第三方代码：GSAP 3.12.5 与 ScrollTrigger 3.12.5（文件头写明受 [gsap.com/standard-license](https://gsap.com/standard-license) 条款约束）、MapLibre GL JS 与 PMTiles（目录内各带 `LICENSE.txt`）。
-- 地图署名：© OpenStreetMap · Protomaps · Mapterhorn · ESA WorldCover。其中 Protomaps 底图是 OpenStreetMap（ODbL）数据的成品，ESA WorldCover 为 CC-BY 4.0。选型与来源说明见 [docs/map-selection.md](docs/map-selection.md)。
+- 地图署名：© OpenStreetMap · Protomaps · Mapterhorn · ESA WorldCover。其中 Protomaps 底图是 OpenStreetMap（ODbL）数据的成品，ESA WorldCover 为 CC-BY 4.0。在线细节瓦片（放大后）来自 OpenFreeMap，署名 OpenFreeMap © OpenMapTiles，数据 © OpenStreetMap；页面只在在线细节生效时显示该署名，在线不可用时自动回到自托管渲染。选型与来源说明见 [docs/map-selection.md](docs/map-selection.md)。
 - 驾车路线由 OSRM 公共 demo 在作者本机一次性生成（见 `scripts/build-trip-map.mjs`，仅限非商用）。
 - 本仓库目前没有 LICENSE 文件，未声明开源许可。
 

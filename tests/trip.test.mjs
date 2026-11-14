@@ -106,6 +106,23 @@ test("使用地图的路书：三份 PMTiles、routes.geojson 与共享模块都
   assert.doesNotMatch(html, /leaflet/i, "不应再引用 Leaflet");
 });
 
+test("共享地图样式含街道名、旅行 POI 与建筑图层，且大缩放级别不再整片留白", { skip: !usesMap && "地图尚未启用（MAP_READY=false）" }, async () => {
+  const code = await readFile(path.join(site, "vendor/map/trip-map.js"), "utf8");
+  for (const id of ["label-road-major", "label-road-minor", "poi-service", "poi-scenic", "buildings"]) assert.ok(code.includes(`'${id}'`), `trip-map.js 缺少图层 ${id}`);
+  // 详细瓦片只沿路线存在：缺失的矢量瓦片会画成空白，所以页面必须声明整幅数据的最高缩放级别，其余图层从它过放大
+  assert.match(html, /baseFullZoom\s*:\s*\d+/, "TripMap.create 需要 baseFullZoom");
+});
+
+test("高缩放细节层：页面启用在线细节，模块含离线回退，且边界层不画国界/争议/海上线", { skip: !usesMap && "地图尚未启用（MAP_READY=false）" }, async () => {
+  const code = await readFile(path.join(site, "vendor/map/trip-map.js"), "utf8");
+  assert.match(html, /detail\s*:\s*'https:\/\/tiles\.openfreemap\.org\/planet'/, "TripMap.create 需要传入 detail");
+  for (const part of ["stopDetail", "detailReady", "AbortError"]) assert.ok(code.includes(part), `trip-map.js 缺少回退路径 ${part}`);
+  // 合规：细节边界层只取省/地/县级（OSM admin_level 4/5/6/8），并显式排除国界、争议线与海上线
+  const start = code.lastIndexOf("// admin boundaries"), boundary = code.slice(start, code.indexOf("// labels", start));
+  assert.match(boundary, /\['>',\s*\['get',\s*'admin_level'\],\s*2\]/, "边界层需排除 admin_level <= 2");
+  assert.ok(boundary.includes("'disputed'") && boundary.includes("'maritime'"), "边界层需排除 disputed 与 maritime");
+});
+
 async function loadTripMap() {
   const code = await readFile(path.join(site, "vendor/map/trip-map.js"), "utf8");
   const sandbox = { URLSearchParams, Number, Math, RangeError, Array, Object, Set, document: {}, location: { href: "http://x/" } };

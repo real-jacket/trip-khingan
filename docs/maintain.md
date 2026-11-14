@@ -26,7 +26,7 @@ pnpm map:build --landcover          # 由 ESA WorldCover 生成 landcover.pmtile
 pnpm map:build --validate           # 复用旧路线时，只检查回头路
 ```
 
-低缩放层用大范围、高缩放层只覆盖路线走廊和点位；页面 `maxBounds` 不超出已制作范围。`site/map/` 合计不超过 40 MB（测试强制）；重生成的二进制会永久留在 Git 历史里，定稿后别反复重建。
+低缩放层用大范围、高缩放层只覆盖路线走廊和点位；页面 `maxBounds` 不超出已制作范围。`site/map/` 合计不超过 40 MB（测试强制）；重生成的二进制会永久留在 Git 历史里，定稿后别反复重建。 页面选项 `baseFullZoom`（底图整幅覆盖的最高缩放）与 `map.json` 的 tier 要同步：改 tier 的 z 范围时同时改它，测试会检查该选项存在。样式新增街道名（z13+）、旅行 POI 圆点（z13/14+）、建筑（z14+），数据缺了就不要加对应图层。Protomaps 日构建 URL 会过期（404），重抽取前先把 `map.json` 里的日期换成最新一天。
 
 底图保持土地覆盖地形图，上面叠分级道路（含 G/S 编号）和省/市/县界与地名，国界与争议线不画，页面用 `TripMap.renderLegend` 放中文图例。地图下方保留“用高德查看路线”分段清单：`TripMap.navSegments` 与 `TripMap.amapRoute`，坐标转 GCJ-02。画出的路线用来看，分段导航用来走，两者都要有。
 
@@ -41,6 +41,7 @@ pnpm preview            # http://127.0.0.1:4190/trip-khingan/，支持 Range，�
 
 - 在真实浏览器按 1280px 桌面与 390px 手机检查：标题、图片、控件可读，无横向溢出，无控制台错误，“回旅行首页”可见可点。
 - 地图渲染出土地覆盖、分级道路、境界与地名、按天路线和图例；高德分段链接数量与方案/天一致。
+- 高缩放细节层：页面传 `detail: 'https://tiles.openfreemap.org/planet'` 后，z11 起叠加 OpenFreeMap 在线瓦片，离线数据负责总览与兜底（说明、合规与回退见 [地图选型](map-selection.md) 第 0a 节）。改 `trip-map.js` 后同步拷贝到另一个旅行仓库并保持逐字节一致；在线境界层的 `admin_level > 2`、`disputed`、`maritime` 过滤不能删，测试会检查。验收要看三件事：正常总览外观不变；屏蔽 `tiles.openfreemap.org` 后刷新仍是完整的离线地图；放大到 z14/z16 有路名和汉字地名。
 - 照片加载、放大/关闭、方案与日期选择、地图缩放与点位侧栏、清单勾选等核心交互实际可用。
 
 第三方地图/平台链接受网络影响；页面内容是历史计划，不要把它改写成已完成的行程。

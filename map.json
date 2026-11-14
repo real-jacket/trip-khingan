@@ -1,6 +1,6 @@
 {
   "base": {
-    "url": "https://build.protomaps.com/20261107.pmtiles",
+    "url": "https://build.protomaps.com/20261113.pmtiles",
     "tiers": [
       {
         "bbox": [
@@ -20,6 +20,11 @@
         ],
         "minzoom": 10,
         "maxzoom": 12
+      },
+      {
+        "corridor": 8,
+        "minzoom": 13,
+        "maxzoom": 14
       }
     ]
   },
