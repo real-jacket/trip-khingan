@@ -1,6 +1,6 @@
-# 新旅行调研手册（小红书 / 抖音 / B站）
+# 更新机位与资料的调研手册（小红书 / 抖音 / B站）
 
-路径相对项目根。平台访问统一走 `agent-reach` 技能，不自造方案；本文只补充摄影路书的查法、取舍和落盘规则。全程只读：不登录、不读浏览器 Cookie、不发帖/评论/点赞。
+路径相对项目根。平台访问统一走 `agent-reach` 技能，不自造方案；本文补充更新这份路书机位和资料时的查法、取舍和落盘规则。全程只读：不登录、不读浏览器 Cookie、不发帖/评论/点赞。
 
 ## 1. 开工前体检
 
@@ -45,13 +45,13 @@ agent-reach doctor --json
 
 ## 4. 存放规则
 
-- 原始命令输出、笔记正文、下载文件放 `work/research/`（已 Git 忽略）。本项目规则覆盖 agent-reach 的「只用 /tmp」默认，因为台账需跨会话保留；`work/brief.md` 同目录。
+- 原始命令输出、笔记正文、下载文件放 `work/research/`（已 Git 忽略）。本项目规则覆盖 agent-reach 的「只用 /tmp」默认，因为台账需跨会话保留；台账 `work/ledger.md` 放在 `work/` 下。
 - 小红书下载：`opencli xiaohongshu download "<含 xsec_token 的完整 URL>" --output work/research/xhs-<note-id>`。
 - 公开文件（`site/**`，含路书与 `trip.json`）永不出现 `xsec_token`、`xsec_source`、签名参数、本地路径；`tests/trip.test.mjs` 会拦截。发布前统一规范链接：
   - 小红书 `https://www.xiaohongshu.com/explore/<note-id>`
   - 抖音 `https://www.douyin.com/video/<aweme_id>`（图文用笔记页 URL）
   - B站 `https://www.bilibili.com/video/<BV…>`，必要时加 `?t=<秒>`
-- 带 token 的原始 URL 只留在 `research/` 的原始输出里；`brief.md` 链接列同样使用规范链接。
+- 带 token 的原始 URL 只留在 `research/` 的原始输出里；`work/ledger.md` 链接列同样使用规范链接。
 
 ## 5. 图片与封面
 
@@ -74,7 +74,7 @@ file site/cover.webp   # 应显示 Web/P image
 
 ## 7. 台账格式
 
-落在 `work/brief.md` 的「来源台账」，列固定为：
+落在被 Git 忽略的 `work/ledger.md`，列固定为：
 
 | 主题 | 平台 | 后端/命令 | 作品ID | 作者/机构 | 作者主页 | 规范链接 | 发布日 | 拍摄/生效日 | 地点与入口 | 已核实 | 未核实 | 查看日 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|

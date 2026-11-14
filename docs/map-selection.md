@@ -8,7 +8,7 @@
 
 下文第 1–9 节是选型调研，保留原样；实际实现与调研建议不同之处以本节为准。
 
-- 共用模块 `site/vendor/map/trip-map.js`（`window.TripMap`）+ `trip-map.css`，每个旅行仓库各带一份拷贝；`pnpm map:build` 生成该趟数据（用法见 [新增路书](add-a-trip.md) 的“地图和机位”）。
+- 共用模块 `site/vendor/map/trip-map.js`（`window.TripMap`）+ `trip-map.css`，本仓库自带一份拷贝；`pnpm map:build` 生成本趟数据（用法见 [维护指南](maintain.md) 的“重建地图数据”）。
 - 底图四层：ESA WorldCover 2021 v200 土地覆盖栅格（10 m，众数滤波去碎斑，512 px 无损 WebP）→ 浅山体阴影 → Protomaps 矢量道路/水系/境界/地名 → 路线与点位。用户要求的是“用颜色区分山地森林、植被、城镇”的土地覆盖图，单纯山体阴影不够。
 - 色板：林地 `#b5c79e`、灌丛 `#cbd5ac`、草地 `#dde2b6`、农田 `#efe2b2`、建成区 `#d9bfae`、裸地 `#e5dac6`、水体 `#b7cdcf`、湿地 `#c3d7c9`。试过按高程着色（`reliefTint`），会让各类颜色发浑，最终关闭。
 - 署名：`© OpenStreetMap · Protomaps · Mapterhorn · ESA WorldCover`（WorldCover 为 CC-BY 4.0）。
@@ -21,7 +21,7 @@
 
 ## 1. 需求（来自项目约束）
 
-- 纯静态、每个旅行是自己的 GitHub Pages 站点（`/<仓库名>/`），无后端、无处存密钥；每个旅行是独立 HTML。
+- 纯静态、每个旅行是自己的 GitHub Pages 站点（`/trip-khingan/`），无后端、无处存密钥；每个旅行是独立 HTML。
 - 目的地在中国大陆山区（皖南、大兴安岭），观众多为手机、偶尔弱网。
 - 要能配色到纸色 / 深林绿 / 锈红的杂志风；要地形、水系、中文地名、分级道路、铁路/机场（加分）、沿真实道路的每日路线、拍摄点标记。
 - 导航交给高德/百度 App 深链；页面内不需要实时路况。**同意不做实时路况**：静态站拿不到路况数据，且路况对“候选计划/历史路书”没有价值。
@@ -105,7 +105,7 @@ site/vendor/map/{fonts/Noto Sans Regular|Medium|Italic/0-255.pbf, sprites/v4/lig
 site/map/{base.pmtiles,terrain.pmtiles,routes.geojson,spots.geojson,style.json}
 work/   # 被忽略：bbox.txt、osrm 原始响应、gen-style.mjs
 ```
-页面在 `/<仓库名>/index.html`，用 `vendor/map/...` 相对路径。
+页面在 `/trip-khingan/index.html`，用 `vendor/map/...` 相对路径。
 
 **步骤**
 1. 定 bbox（含全部住宿/拍摄点外扩 ~15 km）。Khingan 靠边境：bbox 北移避开外蒙，或标注过滤 `["==",["get","script"],"Han"]` 隐藏蒙古/西里尔标注。
